@@ -90,10 +90,10 @@ board_input = raw_input("Board: ")
 #player_input_list as a reference.
 
 hand_list = [hand] * number_of_players
-hand_list[0] = [deck[51], deck[38], deck[21], deck[9]] #AsAhTcJd
-del deck[51]; del deck[38]; del deck[21]; del deck[9] #card removal
+hand_list[0] = [deck[50], deck[38], deck[21], deck[9]] #AsAhTcJd
+del deck[51]; del deck[38]; del deck[21]; del deck[9]  #card removal
 hand_list[1] = [deck[34], deck[22], deck[12], deck[6]] #QhKc2c8d
-del deck[34]; del deck[22]; del deck[12]; del deck[6] #card removal
+del deck[34]; del deck[22]; del deck[12]; del deck[6]  #card removal
 
 #this part below initiates after user says "Go!"
 
@@ -115,7 +115,7 @@ board[4] = deck[x]
 
 #generate 60 combos per player
 
-player_combos = []
+unranked_combos = []
 for i in range(0, number_of_players):
   combos = []
   for j in range(60):
@@ -123,14 +123,18 @@ for i in range(0, number_of_players):
     for k in range(5):
       five_card_hand.append(Card())
     combos.append(five_card_hand)
-  player_combos.append(combos)
+  unranked_combos.append(combos)
 
 #i is player number, j is index in 60 hand list
 #a/b from individual hand, c/d/e from board
 
 def combo_builder(i, j, a, b, c, d, e):
   temp_hand = [hand_list[i][a], hand_list[i][b], board[c], board[d], board[e]]
-  player_combos[i][j] = temp_hand
+  #sort temp_hand before building unranked_combos
+  temp_hand.sort(key = lambda temp: temp.rank, reverse = True)
+  unranked_combos[i][j] = temp_hand
+  #attach the overall hand rank element to each combo
+  unranked_combos[i][j].append(-1)
 
 for i in range(0, number_of_players):
   combo_builder(i, 0, 0, 1, 0, 1, 2)
@@ -193,3 +197,149 @@ for i in range(0, number_of_players):
   combo_builder(i, 57, 2, 3, 1, 2, 4)
   combo_builder(i, 58, 2, 3, 1, 3, 4)
   combo_builder(i, 59, 2, 3, 2, 3, 4)
+  
+#create function for taking 5 unsorted cards as a parameter and generating
+#a ranked player combo record with 5 sorted cards and an updated int to
+#indicate the overall rank
+
+def rank_hand(unranked_hand):
+  #check if any pairs exist
+  if (unranked_hand[0].rank == unranked_hand[1].rank or
+    unranked_hand[1].rank == unranked_hand[2].rank or
+    unranked_hand[2].rank == unranked_hand[3].rank or
+    unranked_hand[3].rank == unranked_hand[4].rank):
+    #pairs exist!
+    if ((unranked_hand[0].rank == unranked_hand[1].rank and
+      unranked_hand[1].rank != unranked_hand[2].rank and
+      unranked_hand[2].rank != unranked_hand[3].rank and
+      unranked_hand[3].rank != unranked_hand[4].rank) or
+      (unranked_hand[0].rank != unranked_hand[1].rank and
+      unranked_hand[1].rank == unranked_hand[2].rank and
+      unranked_hand[2].rank != unranked_hand[3].rank and
+      unranked_hand[3].rank != unranked_hand[4].rank) or
+      (unranked_hand[0].rank != unranked_hand[1].rank and
+      unranked_hand[1].rank != unranked_hand[2].rank and
+      unranked_hand[2].rank == unranked_hand[3].rank and
+      unranked_hand[3].rank != unranked_hand[4].rank) or
+      (unranked_hand[0].rank != unranked_hand[1].rank and
+      unranked_hand[1].rank != unranked_hand[2].rank and
+      unranked_hand[2].rank != unranked_hand[3].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank)):
+      unranked_hand[5] = 1
+    elif ((unranked_hand[0].rank == unranked_hand[1].rank and
+      unranked_hand[1].rank != unranked_hand[2].rank and
+      unranked_hand[2].rank == unranked_hand[3].rank and
+      unranked_hand[3].rank != unranked_hand[4].rank) or
+      (unranked_hand[0].rank == unranked_hand[1].rank and
+      unranked_hand[1].rank != unranked_hand[2].rank and
+      unranked_hand[2].rank != unranked_hand[3].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank) or
+      (unranked_hand[0].rank != unranked_hand[1].rank and
+      unranked_hand[1].rank == unranked_hand[2].rank and
+      unranked_hand[2].rank != unranked_hand[3].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank)):
+      unranked_hand[5] = 2
+    elif ((unranked_hand[0].rank == unranked_hand[1].rank and
+      unranked_hand[1].rank == unranked_hand[2].rank and
+      unranked_hand[2].rank != unranked_hand[3].rank and
+      unranked_hand[3].rank != unranked_hand[4].rank) or
+      (unranked_hand[0].rank != unranked_hand[1].rank and
+      unranked_hand[1].rank == unranked_hand[2].rank and
+      unranked_hand[2].rank == unranked_hand[3].rank and
+      unranked_hand[3].rank != unranked_hand[4].rank) or
+      (unranked_hand[0].rank != unranked_hand[1].rank and
+      unranked_hand[1].rank != unranked_hand[2].rank and
+      unranked_hand[2].rank == unranked_hand[3].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank)):
+      unranked_hand[5] = 3
+    elif ((unranked_hand[0].rank == unranked_hand[1].rank and
+      unranked_hand[1].rank == unranked_hand[2].rank and
+      unranked_hand[2].rank != unranked_hand[3].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank) or
+      (unranked_hand[0].rank == unranked_hand[1].rank and
+      unranked_hand[1].rank != unranked_hand[2].rank and
+      unranked_hand[2].rank == unranked_hand[3].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank)):
+      unranked_hand[5] = 6
+    else:
+      unranked_hand[5] = 7
+  else:
+    #pairs do not exist!
+    straight_bool = False
+    flush_bool = False
+    if ((unranked_hand[0].rank == 14 and unranked_hand[1].rank == 5) or
+      (unranked_hand[0].rank - unranked_hand[4].rank == 4)):
+      straight_bool = True
+    if (unranked_hand[0].suit == unranked_hand[1].suit and
+      unranked_hand[1].suit == unranked_hand[2].suit and
+      unranked_hand[2].suit == unranked_hand[3].suit and
+      unranked_hand[3].suit == unranked_hand[4].suit):
+      flush_bool = True
+    if straight_bool == False and flush_bool == False:
+      unranked_hand[5] = 0
+    elif straight_bool == True and flush_bool == False:
+      unranked_hand[5] = 4
+    elif straight_bool == False and flush_bool == True:
+      unranked_hand[5] = 5
+    else:
+      unranked_hand[5] = 8
+
+#only need to sort paired hands and straights/straight flush (consider wheel)
+def sort_hand(unranked_hand):
+  #one pair
+  if unranked_hand[5] == 1:
+    if unranked_hand[1].rank == unranked_hand[2].rank:
+      unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
+    elif unranked_hand[2].rank == unranked_hand[3].rank:
+      unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
+      unranked_hand[1], unranked_hand[3] = unranked_hand[3], unranked_hand[1]
+    elif unranked_hand[3].rank == unranked_hand[4].rank:
+      unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
+      unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
+      unranked_hand[2], unranked_hand[3] = unranked_hand[3], unranked_hand[2]
+      unranked_hand[3], unranked_hand[4] = unranked_hand[4], unranked_hand[3]
+  #two pair
+  elif unranked_hand[5] == 2:
+    if (unranked_hand[0].rank == unranked_hand[1].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank):
+      unranked_hand[2], unranked_hand[4] = unranked_hand[4], unranked_hand[2]
+    elif (unranked_hand[1].rank == unranked_hand[2].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank):
+      unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
+      unranked_hand[2], unranked_hand[4] = unranked_hand[4], unranked_hand[2]
+  #trips
+  elif unranked_hand[5] == 3:
+    if (unranked_hand[1].rank == unranked_hand[2].rank and
+      unranked_hand[2].rank == unranked_hand[3].rank):
+      unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
+    elif (unranked_hand[2].rank == unranked_hand[3].rank and
+      unranked_hand[3].rank == unranked_hand[4].rank):
+      unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
+      unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
+  #straight and straight flush (wheel check)
+  elif unranked_hand[5] == 4 or 8:
+    if unranked_hand[0].rank == 14 and unranked_hand[1].rank == 5:
+      unranked_hand[0], unranked_hand[1] = unranked_hand[1], unranked_hand[0]
+      unranked_hand[1], unranked_hand[2] = unranked_hand[2], unranked_hand[1]
+      unranked_hand[2], unranked_hand[3] = unranked_hand[3], unranked_hand[2]
+      unranked_hand[3], unranked_hand[4] = unranked_hand[4], unranked_hand[3]
+  #full house
+  elif unranked_hand[5] == 6:
+    if unranked_hand[2].rank == unranked_hand[3].rank:
+      unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
+      unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
+  #quads
+  else:
+    if unranked_hand[3].rank == unranked_hand[4].rank:
+      unranked_hand[0], unranked_hand[4] = unranked_hand[4], unranked_hand[0]
+
+#test output
+
+rank_hand(unranked_combos[0][0])
+sort_hand(unranked_combos[0][0])
+
+print unranked_combos[0][0][0].name
+print unranked_combos[0][0][1].name
+print unranked_combos[0][0][2].name
+print unranked_combos[0][0][3].name
+print unranked_combos[0][0][4].name
