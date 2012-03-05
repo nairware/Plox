@@ -333,11 +333,14 @@ def sort_hand(unranked_hand):
     if unranked_hand[3].rank == unranked_hand[4].rank:
       unranked_hand[0], unranked_hand[4] = unranked_hand[4], unranked_hand[0]
 
+#rank and sort all combos for all players
+for i in range(0, number_of_players):
+  for j in range(0, 60):
+    rank_hand(unranked_combos[i][j])
+    sort_hand(unranked_combos[i][j])
+
 #test output
-
-rank_hand(unranked_combos[0][0])
-sort_hand(unranked_combos[0][0])
-
+print "hand 0"
 print unranked_combos[0][0][0].name
 print unranked_combos[0][0][1].name
 print unranked_combos[0][0][2].name
