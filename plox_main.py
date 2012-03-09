@@ -11,9 +11,9 @@ hand = []
 for each in range(4):
   hand.append(Card())
 
-board = []
+board_source = []
 for each in range(5):
-  board.append(Card())
+  board_source.append(Card())
 
 deck = []
 for each in range(52):
@@ -106,22 +106,14 @@ number_of_trials = 500
 
 for each in range(0, number_of_trials):
 
-  #this part below initiates after user says "Go!"
-  #generate rest of board randomly, depending on what is needed
-  if board[0].rank == 0:
-    for i in range(0, 3):
-      x = random.randrange(0, len(deck))
-      board[i] = deck[x]
-      del deck[x]
-  
-  if board[3].rank == 0:
-    x = random.randrange(0, len(deck))
-    board[3] = deck[x]
-    del deck[x]
-  
-  x = random.randrange(0, len(deck))
-  board[4] = deck[x]
-  print board[0].name, board[1].name, board[2].name, board[3].name, board[4].name
+  temp_deck = deck[:]
+  board = board_source
+
+  #only works for scenario in which flop is not specified
+  for i in range(5):
+    x = random.randrange(0, len(temp_deck))
+    board[i] = temp_deck[x]
+    del temp_deck[x]
   
   #generate 60 combos per player
   unranked_combos = []
