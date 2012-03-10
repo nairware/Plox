@@ -79,6 +79,8 @@ number_of_players = input("Enter the number of players: ")
 #hard-code number of players for now, even though this comes it as input
 number_of_players = 2
 
+final_tally = [0.00] * number_of_players
+
 hand_list = [hand] * number_of_players
 player_input_list = ["None"] * number_of_players
 
@@ -91,14 +93,12 @@ for i in range(0, number_of_players):
 #list, and then populate the hand_list with actual cards from the deck, using
 #player_input_list as a reference.
 hand_list = [hand] * number_of_players
-hand_list[0] = [deck[51], deck[50], deck[38], deck[37]] #AsAhTcJd
-hand_list[1] = [deck[25], deck[24], deck[23], deck[22]]  #AcAd9d6d
-del deck[51]; del deck[50]; del deck[38]; del deck[37]  #card removal
-del deck[25]; del deck[24]; del deck[23]; del deck[22]  #card removal
+hand_list[0] = [deck[51], deck[50], deck[38], deck[37]]
+hand_list[1] = [deck[25], deck[24], deck[23], deck[22]]
+del deck[51]; del deck[50]; del deck[38]; del deck[37]
+del deck[25]; del deck[24]; del deck[23]; del deck[22]
 
 board_input = raw_input("Board: ")
-
-final_tally = [0.00] * number_of_players
 
 #***LOOP***
 
@@ -106,14 +106,22 @@ number_of_trials = 500
 
 for each in range(0, number_of_trials):
 
+  #generate random flop, turn and river
   temp_deck = deck[:]
-  board = board_source
-
-  #only works for scenario in which flop is not specified
-  for i in range(5):
+  board = board_source[:]  
+  if board_source[0].rank == 0:
+    for i in range(5):
+      x = random.randrange(0, len(temp_deck))
+      board[i] = temp_deck[x]
+      del temp_deck[x]
+  elif board_source[3].rank == 0:
+    for i in range(3, 5):
+      x = random.randrange(0, len(temp_deck))
+      board[i] = temp_deck[x]
+      del temp_deck[x]
+  else:
     x = random.randrange(0, len(temp_deck))
-    board[i] = temp_deck[x]
-    del temp_deck[x]
+    board[4] = temp_deck[x]
   
   #generate 60 combos per player
   unranked_combos = []
