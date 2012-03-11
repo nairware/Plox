@@ -7,10 +7,6 @@ class Card:
   suit = "x"
   name = "Xx"
 
-hand = []
-for each in range(4):
-  hand.append(Card())
-
 board_source = []
 for each in range(5):
   board_source.append(Card())
@@ -72,37 +68,84 @@ deck[49].rank = 12; deck[49].suit = "s"; deck[49].name = "Qs"
 deck[50].rank = 13; deck[50].suit = "s"; deck[50].name = "Ks"
 deck[51].rank = 14; deck[51].suit = "s"; deck[51].name = "As"
 
+number_of_trials = 500
+
 #***USER INPUT***
 
 number_of_players = input("Enter the number of players: ")
 
-#hard-code number of players for now, even though this comes it as input
-number_of_players = 2
-
 final_tally = [0.00] * number_of_players
 
-hand_list = [hand] * number_of_players
+hand_list = []
+for i in range(number_of_players):
+  preflop_hand = []
+  for j in range(4):
+    preflop_hand.append(Card())
+  hand_list.append(preflop_hand)
+
 player_input_list = ["None"] * number_of_players
 
+#validate hand input function
+def valid_hand(user_hand_input):
+  if (len(user_hand_input) == 11 and user_hand_input[2] == "," and
+      user_hand_input[5] == "," and user_hand_input[8] == ","):
+    return True
+  else:
+    return False
+
+#do while loop to prompt user for each player hand
+#validate input, assign hands based on input, and remove cards from deck
 for i in range(0, number_of_players):
   player_input_list[i] = raw_input("Player %d cards: " % (i + 1))
+  while valid_hand(player_input_list[i]) == False:
+    player_input_list[i] = raw_input("Player %d cards: " % (i + 1))
+  count = 0
+  for j in range(0, 4):
+    card_name = player_input_list[i][count:(count + 2)]
+    count = count + 3
+    for k in range(0, len(deck)):
+      if deck[k].name == card_name:
+        hand_list[i][j] = deck[k]
+        del deck[k]
+        break
 
-#hard-code hand_list for now
-#use player_input_list later to set hand_list
-#player_input_list is a text list. it will be used to sort through the deck
-#list, and then populate the hand_list with actual cards from the deck, using
-#player_input_list as a reference.
-hand_list = [hand] * number_of_players
-hand_list[0] = [deck[51], deck[50], deck[38], deck[37]]
-hand_list[1] = [deck[25], deck[24], deck[23], deck[22]]
-del deck[51]; del deck[50]; del deck[38]; del deck[37]
-del deck[25]; del deck[24]; del deck[23]; del deck[22]
+#validate board input function
+def valid_board(user_board_input):
+  if len(user_board_input) == 0:
+    return True
+  elif len(user_board_input) == 8:
+    return True
+  elif len(user_board_input) == 11:
+    return True
+  else:
+    return False
 
+#do while loop to prompt user for board and validate input
 board_input = raw_input("Board: ")
+while valid_board(board_input) == False:
+  board_input = raw_input("Board: ")
+if len(board_input) == 8:
+  count = 0
+  for j in range(0, 3):
+    card_name = board_input[count:(count + 2)]
+    count = count + 3
+    for k in range(0, len(deck)):
+      if deck[k].name == card_name:
+        board_source[j] = deck[k]
+        del deck[k]
+        break
+if len(board_input) == 11:
+  count = 0
+  for j in range(0, 4):
+    card_name = board_input[count:(count + 2)]
+    count = count + 3
+    for k in range(0, len(deck)):
+      if deck[k].name == card_name:
+        board_source[j] = deck[k]
+        del deck[k]
+        break
 
 #***LOOP***
-
-number_of_trials = 500
 
 for each in range(0, number_of_trials):
 
@@ -520,8 +563,9 @@ for each in range(0, number_of_trials):
   for i in range(0, number_of_players):
     final_tally[i] = final_tally[i] + hand_tally[i]
 
-player_zero_percentage = (final_tally[0] / number_of_trials) * 100
-player_one_percentage = (final_tally[1] / number_of_trials) * 100
+#***GENERATE OUTPUT***
 
-print player_zero_percentage, "%"
-print player_one_percentage, "%"
+player_percentage = [0] * number_of_players
+for i in range(0, number_of_players):
+  player_percentage[i] = (final_tally[i] / number_of_trials) * 100
+  print "Player %d equity:" % (i + 1), player_percentage[i], "%"
