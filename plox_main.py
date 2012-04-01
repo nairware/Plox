@@ -1,3 +1,4 @@
+from Tkinter import *
 import random
 
 #***GLOBAL VARIABLES INIT***
@@ -70,278 +71,331 @@ deck[51].rank = 14; deck[51].suit = "s"; deck[51].name = "As"
 
 number_of_trials = 500
 
+player_input_list = [""] * 6
+hand_list = []
+
+class App:
+  
+  def __init__(self, master):
+    frame = Frame(master)
+    frame.pack()
+    
+    self.textbox1 = Entry(frame, width=20)
+    self.textbox1.pack(side=TOP)
+    self.textbox2 = Entry(frame, width=20)
+    self.textbox2.pack(side=TOP)
+    self.textbox3 = Entry(frame, width=20)
+    self.textbox3.pack(side=TOP)
+    self.textbox4 = Entry(frame, width=20)
+    self.textbox4.pack(side=TOP)
+    self.textbox5 = Entry(frame, width=20)
+    self.textbox5.pack(side=TOP)
+    self.textbox6 = Entry(frame, width=20)
+    self.textbox6.pack(side=TOP)
+    
+    self.message = Button(frame, text="Simulate", command=self.message)
+    self.message.pack(side=TOP)
+
+  def message(self):
+    player_input_list[0] = app.textbox1.get()
+    player_input_list[1] = app.textbox2.get()
+    player_input_list[2] = app.textbox3.get()
+    player_input_list[3] = app.textbox4.get()
+    player_input_list[4] = app.textbox5.get()
+    player_input_list[5] = app.textbox6.get()
+    for i in range(0, 6):
+      count = 0
+      for j in range(0, 4):
+        card_name = player_input_list[i][count:(count + 2)]
+        count = count + 3
+        for k in range(0, len(deck)):
+          if deck[k].name == card_name:
+            hand_list[i][j] = deck[k]
+            del deck[k]
+            break
+
+root = Tk()
+app = App(root)
+
 #***USER INPUT***
 
-number_of_players = input("Enter the number of players: ")
-
-final_tally = [0.00] * number_of_players
-
-hand_list = []
-for i in range(number_of_players):
-  preflop_hand = []
-  for j in range(4):
-    preflop_hand.append(Card())
-  hand_list.append(preflop_hand)
-
-player_input_list = ["None"] * number_of_players
-
-#validate hand input function
-def valid_hand(user_hand_input):
-  if (len(user_hand_input) == 11 and user_hand_input[2] == "," and
-      user_hand_input[5] == "," and user_hand_input[8] == ","):
-    return True
-  else:
-    return False
-
-#do while loop to prompt user for each player hand
-#validate input, assign hands based on input, and remove cards from deck
-for i in range(0, number_of_players):
-  player_input_list[i] = raw_input("Player %d cards: " % (i + 1))
-  while valid_hand(player_input_list[i]) == False:
-    player_input_list[i] = raw_input("Player %d cards: " % (i + 1))
-  count = 0
-  for j in range(0, 4):
-    card_name = player_input_list[i][count:(count + 2)]
-    count = count + 3
-    for k in range(0, len(deck)):
-      if deck[k].name == card_name:
-        hand_list[i][j] = deck[k]
-        del deck[k]
-        break
-
-#validate board input function
-def valid_board(user_board_input):
-  if len(user_board_input) == 0:
-    return True
-  elif len(user_board_input) == 8:
-    return True
-  elif len(user_board_input) == 11:
-    return True
-  else:
-    return False
-
-#do while loop to prompt user for board and validate input
-board_input = raw_input("Board: ")
-while valid_board(board_input) == False:
+def calculate(number_of_players):
+  
+  final_tally = [0.00] * number_of_players
+  
+  
+  for i in range(number_of_players):
+    preflop_hand = []
+    for j in range(4):
+      preflop_hand.append(Card())
+    hand_list.append(preflop_hand)
+  
+  #validate hand input function
+  def valid_hand(user_hand_input):
+    if (len(user_hand_input) == 11 and user_hand_input[2] == "," and
+        user_hand_input[5] == "," and user_hand_input[8] == ","):
+      return True
+    else:
+      return False
+  
+  
+  
+  #validate board input function
+  def valid_board(user_board_input):
+    if len(user_board_input) == 0:
+      return True
+    elif len(user_board_input) == 8:
+      return True
+    elif len(user_board_input) == 11:
+      return True
+    else:
+      return False
+  
+  #do while loop to prompt user for board and validate input
   board_input = raw_input("Board: ")
-if len(board_input) == 8:
-  count = 0
-  for j in range(0, 3):
-    card_name = board_input[count:(count + 2)]
-    count = count + 3
-    for k in range(0, len(deck)):
-      if deck[k].name == card_name:
-        board_source[j] = deck[k]
-        del deck[k]
-        break
-if len(board_input) == 11:
-  count = 0
-  for j in range(0, 4):
-    card_name = board_input[count:(count + 2)]
-    count = count + 3
-    for k in range(0, len(deck)):
-      if deck[k].name == card_name:
-        board_source[j] = deck[k]
-        del deck[k]
-        break
-
-#***LOOP***
-
-for each in range(0, number_of_trials):
-
-  #generate random flop, turn and river
-  temp_deck = deck[:]
-  board = board_source[:]  
-  if board_source[0].rank == 0:
-    for i in range(5):
+  while valid_board(board_input) == False:
+    board_input = raw_input("Board: ")
+  if len(board_input) == 8:
+    count = 0
+    for j in range(0, 3):
+      card_name = board_input[count:(count + 2)]
+      count = count + 3
+      for k in range(0, len(deck)):
+        if deck[k].name == card_name:
+          board_source[j] = deck[k]
+          del deck[k]
+          break
+  if len(board_input) == 11:
+    count = 0
+    for j in range(0, 4):
+      card_name = board_input[count:(count + 2)]
+      count = count + 3
+      for k in range(0, len(deck)):
+        if deck[k].name == card_name:
+          board_source[j] = deck[k]
+          del deck[k]
+          break
+  
+  #***LOOP***
+  
+  for each in range(0, number_of_trials):
+  
+    #generate random flop, turn and river
+    temp_deck = deck[:]
+    board = board_source[:]  
+    if board_source[0].rank == 0:
+      for i in range(5):
+        x = random.randrange(0, len(temp_deck))
+        board[i] = temp_deck[x]
+        del temp_deck[x]
+    elif board_source[3].rank == 0:
+      for i in range(3, 5):
+        x = random.randrange(0, len(temp_deck))
+        board[i] = temp_deck[x]
+        del temp_deck[x]
+    else:
       x = random.randrange(0, len(temp_deck))
-      board[i] = temp_deck[x]
-      del temp_deck[x]
-  elif board_source[3].rank == 0:
-    for i in range(3, 5):
-      x = random.randrange(0, len(temp_deck))
-      board[i] = temp_deck[x]
-      del temp_deck[x]
-  else:
-    x = random.randrange(0, len(temp_deck))
-    board[4] = temp_deck[x]
-  
-  #generate 60 combos per player
-  unranked_combos = []
-  for i in range(0, number_of_players):
-    combos = []
-    for j in range(60):
-      five_card_hand = []
-      for k in range(5):
-        five_card_hand.append(Card())
-      combos.append(five_card_hand)
-    unranked_combos.append(combos)
-  
-  #i is player number, j is index in 60 hand list
-  #a/b from individual hand, c/d/e from board
-  def combo_builder(i, j, a, b, c, d, e):
-    temp_hand = [hand_list[i][a], hand_list[i][b], board[c], board[d], board[e]]
-    #sort temp_hand before building unranked_combos
-    temp_hand.sort(key = lambda temp: temp.rank, reverse = True)
-    unranked_combos[i][j] = temp_hand
-    #attach the overall hand rank element to each combo
-    unranked_combos[i][j].append(-1)
-  
-  #***DEFINE GLOBAL FUNCTIONS***
-  
-  #create function for taking 5 unsorted cards as a parameter and generating
-  #a ranked player combo record with 5 sorted cards and an updated int to
-  #indicate the overall rank
-  def rank_hand(unranked_hand):
-    #check if any pairs exist
-    if (unranked_hand[0].rank == unranked_hand[1].rank or
-      unranked_hand[1].rank == unranked_hand[2].rank or
-      unranked_hand[2].rank == unranked_hand[3].rank or
-      unranked_hand[3].rank == unranked_hand[4].rank):
-      #pairs exist!
-      if ((unranked_hand[0].rank == unranked_hand[1].rank and
-        unranked_hand[1].rank != unranked_hand[2].rank and
-        unranked_hand[2].rank != unranked_hand[3].rank and
-        unranked_hand[3].rank != unranked_hand[4].rank) or
-        (unranked_hand[0].rank != unranked_hand[1].rank and
-        unranked_hand[1].rank == unranked_hand[2].rank and
-        unranked_hand[2].rank != unranked_hand[3].rank and
-        unranked_hand[3].rank != unranked_hand[4].rank) or
-        (unranked_hand[0].rank != unranked_hand[1].rank and
-        unranked_hand[1].rank != unranked_hand[2].rank and
-        unranked_hand[2].rank == unranked_hand[3].rank and
-        unranked_hand[3].rank != unranked_hand[4].rank) or
-        (unranked_hand[0].rank != unranked_hand[1].rank and
-        unranked_hand[1].rank != unranked_hand[2].rank and
-        unranked_hand[2].rank != unranked_hand[3].rank and
-        unranked_hand[3].rank == unranked_hand[4].rank)):
-        unranked_hand[5] = 1
-      elif ((unranked_hand[0].rank == unranked_hand[1].rank and
-        unranked_hand[1].rank != unranked_hand[2].rank and
-        unranked_hand[2].rank == unranked_hand[3].rank and
-        unranked_hand[3].rank != unranked_hand[4].rank) or
-        (unranked_hand[0].rank == unranked_hand[1].rank and
-        unranked_hand[1].rank != unranked_hand[2].rank and
-        unranked_hand[2].rank != unranked_hand[3].rank and
-        unranked_hand[3].rank == unranked_hand[4].rank) or
-        (unranked_hand[0].rank != unranked_hand[1].rank and
-        unranked_hand[1].rank == unranked_hand[2].rank and
-        unranked_hand[2].rank != unranked_hand[3].rank and
-        unranked_hand[3].rank == unranked_hand[4].rank)):
-        unranked_hand[5] = 2
-      elif ((unranked_hand[0].rank == unranked_hand[1].rank and
-        unranked_hand[1].rank == unranked_hand[2].rank and
-        unranked_hand[2].rank != unranked_hand[3].rank and
-        unranked_hand[3].rank != unranked_hand[4].rank) or
-        (unranked_hand[0].rank != unranked_hand[1].rank and
-        unranked_hand[1].rank == unranked_hand[2].rank and
-        unranked_hand[2].rank == unranked_hand[3].rank and
-        unranked_hand[3].rank != unranked_hand[4].rank) or
-        (unranked_hand[0].rank != unranked_hand[1].rank and
-        unranked_hand[1].rank != unranked_hand[2].rank and
-        unranked_hand[2].rank == unranked_hand[3].rank and
-        unranked_hand[3].rank == unranked_hand[4].rank)):
-        unranked_hand[5] = 3
-      elif ((unranked_hand[0].rank == unranked_hand[1].rank and
-        unranked_hand[1].rank == unranked_hand[2].rank and
-        unranked_hand[2].rank != unranked_hand[3].rank and
-        unranked_hand[3].rank == unranked_hand[4].rank) or
-        (unranked_hand[0].rank == unranked_hand[1].rank and
-        unranked_hand[1].rank != unranked_hand[2].rank and
-        unranked_hand[2].rank == unranked_hand[3].rank and
-        unranked_hand[3].rank == unranked_hand[4].rank)):
-        unranked_hand[5] = 6
-      else:
-        unranked_hand[5] = 7
-    else:
-      #pairs do not exist!
-      straight_bool = False
-      flush_bool = False
-      if ((unranked_hand[0].rank == 14 and unranked_hand[1].rank == 5) or
-        (unranked_hand[0].rank - unranked_hand[4].rank == 4)):
-        straight_bool = True
-      if (unranked_hand[0].suit == unranked_hand[1].suit and
-        unranked_hand[1].suit == unranked_hand[2].suit and
-        unranked_hand[2].suit == unranked_hand[3].suit and
-        unranked_hand[3].suit == unranked_hand[4].suit):
-        flush_bool = True
-      if straight_bool == False and flush_bool == False:
-        unranked_hand[5] = 0
-      elif straight_bool == True and flush_bool == False:
-        unranked_hand[5] = 4
-      elif straight_bool == False and flush_bool == True:
-        unranked_hand[5] = 5
-      else:
-        unranked_hand[5] = 8
-  
-  #only need to sort paired hands and straights/straight flush (consider wheel)
-  def sort_hand(unranked_hand):
-    #one pair
-    if unranked_hand[5] == 1:
-      if unranked_hand[1].rank == unranked_hand[2].rank:
-        unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
-      elif unranked_hand[2].rank == unranked_hand[3].rank:
-        unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
-        unranked_hand[1], unranked_hand[3] = unranked_hand[3], unranked_hand[1]
-      elif unranked_hand[3].rank == unranked_hand[4].rank:
-        unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
-        unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
-        unranked_hand[2], unranked_hand[3] = unranked_hand[3], unranked_hand[2]
-        unranked_hand[3], unranked_hand[4] = unranked_hand[4], unranked_hand[3]
-    #two pair
-    elif unranked_hand[5] == 2:
-      if (unranked_hand[0].rank == unranked_hand[1].rank and
+      board[4] = temp_deck[x]
+    
+    #generate 60 combos per player
+    unranked_combos = []
+    for i in range(0, number_of_players):
+      combos = []
+      for j in range(60):
+        five_card_hand = []
+        for k in range(5):
+          five_card_hand.append(Card())
+        combos.append(five_card_hand)
+      unranked_combos.append(combos)
+    
+    #i is player number, j is index in 60 hand list
+    #a/b from individual hand, c/d/e from board
+    def combo_builder(i, j, a, b, c, d, e):
+      temp_hand = [hand_list[i][a], hand_list[i][b], board[c], board[d], board[e]]
+      #sort temp_hand before building unranked_combos
+      temp_hand.sort(key = lambda temp: temp.rank, reverse = True)
+      unranked_combos[i][j] = temp_hand
+      #attach the overall hand rank element to each combo
+      unranked_combos[i][j].append(-1)
+    
+    #***DEFINE GLOBAL FUNCTIONS***
+    
+    #create function for taking 5 unsorted cards as a parameter and generating
+    #a ranked player combo record with 5 sorted cards and an updated int to
+    #indicate the overall rank
+    def rank_hand(unranked_hand):
+      #check if any pairs exist
+      if (unranked_hand[0].rank == unranked_hand[1].rank or
+        unranked_hand[1].rank == unranked_hand[2].rank or
+        unranked_hand[2].rank == unranked_hand[3].rank or
         unranked_hand[3].rank == unranked_hand[4].rank):
-        unranked_hand[2], unranked_hand[4] = unranked_hand[4], unranked_hand[2]
-      elif (unranked_hand[1].rank == unranked_hand[2].rank and
-        unranked_hand[3].rank == unranked_hand[4].rank):
-        unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
-        unranked_hand[2], unranked_hand[4] = unranked_hand[4], unranked_hand[2]
-    #trips
-    elif unranked_hand[5] == 3:
-      if (unranked_hand[1].rank == unranked_hand[2].rank and
-        unranked_hand[2].rank == unranked_hand[3].rank):
-        unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
-      elif (unranked_hand[2].rank == unranked_hand[3].rank and
-        unranked_hand[3].rank == unranked_hand[4].rank):
-        unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
-        unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
-    #straight and straight flush (wheel check)
-    elif unranked_hand[5] == 4 or unranked_hand[5] == 8:
-      if unranked_hand[0].rank == 14 and unranked_hand[1].rank == 5:
-        unranked_hand[0], unranked_hand[1] = unranked_hand[1], unranked_hand[0]
-        unranked_hand[1], unranked_hand[2] = unranked_hand[2], unranked_hand[1]
-        unranked_hand[2], unranked_hand[3] = unranked_hand[3], unranked_hand[2]
-        unranked_hand[3], unranked_hand[4] = unranked_hand[4], unranked_hand[3]
-    #full house
-    elif unranked_hand[5] == 6:
-      if unranked_hand[2].rank == unranked_hand[3].rank:
-        unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
-        unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
-    #quads
-    else:
-      if unranked_hand[3].rank == unranked_hand[4].rank:
-        unranked_hand[0], unranked_hand[4] = unranked_hand[4], unranked_hand[0]
-  
-  #function to compare two hands, overall hand strengths unknown
-  #takes two ranked/sorted 5 card hands as parameters
-  #returns int: 1 for hand 1, 2 for hand 2, 0 for tie
-  def compare_hands(hand1, hand2):
-    if hand1[5] > hand2[5]:
-      return 1
-    elif hand1[5] < hand2[5]:
-      return 2
-    else:
-      #high card/flush comparison, hand rank = 0 or 5
-      if hand1[5] == 0 or hand1[5] == 5:
-        if hand1[0].rank > hand2[0].rank:
-          return 1
-        elif hand1[0].rank < hand2[0].rank:
-          return 2
+        #pairs exist!
+        if ((unranked_hand[0].rank == unranked_hand[1].rank and
+          unranked_hand[1].rank != unranked_hand[2].rank and
+          unranked_hand[2].rank != unranked_hand[3].rank and
+          unranked_hand[3].rank != unranked_hand[4].rank) or
+          (unranked_hand[0].rank != unranked_hand[1].rank and
+          unranked_hand[1].rank == unranked_hand[2].rank and
+          unranked_hand[2].rank != unranked_hand[3].rank and
+          unranked_hand[3].rank != unranked_hand[4].rank) or
+          (unranked_hand[0].rank != unranked_hand[1].rank and
+          unranked_hand[1].rank != unranked_hand[2].rank and
+          unranked_hand[2].rank == unranked_hand[3].rank and
+          unranked_hand[3].rank != unranked_hand[4].rank) or
+          (unranked_hand[0].rank != unranked_hand[1].rank and
+          unranked_hand[1].rank != unranked_hand[2].rank and
+          unranked_hand[2].rank != unranked_hand[3].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank)):
+          unranked_hand[5] = 1
+        elif ((unranked_hand[0].rank == unranked_hand[1].rank and
+          unranked_hand[1].rank != unranked_hand[2].rank and
+          unranked_hand[2].rank == unranked_hand[3].rank and
+          unranked_hand[3].rank != unranked_hand[4].rank) or
+          (unranked_hand[0].rank == unranked_hand[1].rank and
+          unranked_hand[1].rank != unranked_hand[2].rank and
+          unranked_hand[2].rank != unranked_hand[3].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank) or
+          (unranked_hand[0].rank != unranked_hand[1].rank and
+          unranked_hand[1].rank == unranked_hand[2].rank and
+          unranked_hand[2].rank != unranked_hand[3].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank)):
+          unranked_hand[5] = 2
+        elif ((unranked_hand[0].rank == unranked_hand[1].rank and
+          unranked_hand[1].rank == unranked_hand[2].rank and
+          unranked_hand[2].rank != unranked_hand[3].rank and
+          unranked_hand[3].rank != unranked_hand[4].rank) or
+          (unranked_hand[0].rank != unranked_hand[1].rank and
+          unranked_hand[1].rank == unranked_hand[2].rank and
+          unranked_hand[2].rank == unranked_hand[3].rank and
+          unranked_hand[3].rank != unranked_hand[4].rank) or
+          (unranked_hand[0].rank != unranked_hand[1].rank and
+          unranked_hand[1].rank != unranked_hand[2].rank and
+          unranked_hand[2].rank == unranked_hand[3].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank)):
+          unranked_hand[5] = 3
+        elif ((unranked_hand[0].rank == unranked_hand[1].rank and
+          unranked_hand[1].rank == unranked_hand[2].rank and
+          unranked_hand[2].rank != unranked_hand[3].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank) or
+          (unranked_hand[0].rank == unranked_hand[1].rank and
+          unranked_hand[1].rank != unranked_hand[2].rank and
+          unranked_hand[2].rank == unranked_hand[3].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank)):
+          unranked_hand[5] = 6
         else:
-          if hand1[1].rank > hand2[1].rank:
+          unranked_hand[5] = 7
+      else:
+        #pairs do not exist!
+        straight_bool = False
+        flush_bool = False
+        if ((unranked_hand[0].rank == 14 and unranked_hand[1].rank == 5) or
+          (unranked_hand[0].rank - unranked_hand[4].rank == 4)):
+          straight_bool = True
+        if (unranked_hand[0].suit == unranked_hand[1].suit and
+          unranked_hand[1].suit == unranked_hand[2].suit and
+          unranked_hand[2].suit == unranked_hand[3].suit and
+          unranked_hand[3].suit == unranked_hand[4].suit):
+          flush_bool = True
+        if straight_bool == False and flush_bool == False:
+          unranked_hand[5] = 0
+        elif straight_bool == True and flush_bool == False:
+          unranked_hand[5] = 4
+        elif straight_bool == False and flush_bool == True:
+          unranked_hand[5] = 5
+        else:
+          unranked_hand[5] = 8
+    
+    #only need to sort paired hands and straights/straight flush (consider wheel)
+    def sort_hand(unranked_hand):
+      #one pair
+      if unranked_hand[5] == 1:
+        if unranked_hand[1].rank == unranked_hand[2].rank:
+          unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
+        elif unranked_hand[2].rank == unranked_hand[3].rank:
+          unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
+          unranked_hand[1], unranked_hand[3] = unranked_hand[3], unranked_hand[1]
+        elif unranked_hand[3].rank == unranked_hand[4].rank:
+          unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
+          unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
+          unranked_hand[2], unranked_hand[3] = unranked_hand[3], unranked_hand[2]
+          unranked_hand[3], unranked_hand[4] = unranked_hand[4], unranked_hand[3]
+      #two pair
+      elif unranked_hand[5] == 2:
+        if (unranked_hand[0].rank == unranked_hand[1].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank):
+          unranked_hand[2], unranked_hand[4] = unranked_hand[4], unranked_hand[2]
+        elif (unranked_hand[1].rank == unranked_hand[2].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank):
+          unranked_hand[0], unranked_hand[2] = unranked_hand[2], unranked_hand[0]
+          unranked_hand[2], unranked_hand[4] = unranked_hand[4], unranked_hand[2]
+      #trips
+      elif unranked_hand[5] == 3:
+        if (unranked_hand[1].rank == unranked_hand[2].rank and
+          unranked_hand[2].rank == unranked_hand[3].rank):
+          unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
+        elif (unranked_hand[2].rank == unranked_hand[3].rank and
+          unranked_hand[3].rank == unranked_hand[4].rank):
+          unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
+          unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
+      #straight and straight flush (wheel check)
+      elif unranked_hand[5] == 4 or unranked_hand[5] == 8:
+        if unranked_hand[0].rank == 14 and unranked_hand[1].rank == 5:
+          unranked_hand[0], unranked_hand[1] = unranked_hand[1], unranked_hand[0]
+          unranked_hand[1], unranked_hand[2] = unranked_hand[2], unranked_hand[1]
+          unranked_hand[2], unranked_hand[3] = unranked_hand[3], unranked_hand[2]
+          unranked_hand[3], unranked_hand[4] = unranked_hand[4], unranked_hand[3]
+      #full house
+      elif unranked_hand[5] == 6:
+        if unranked_hand[2].rank == unranked_hand[3].rank:
+          unranked_hand[0], unranked_hand[3] = unranked_hand[3], unranked_hand[0]
+          unranked_hand[1], unranked_hand[4] = unranked_hand[4], unranked_hand[1]
+      #quads
+      else:
+        if unranked_hand[3].rank == unranked_hand[4].rank:
+          unranked_hand[0], unranked_hand[4] = unranked_hand[4], unranked_hand[0]
+    
+    #function to compare two hands, overall hand strengths unknown
+    #takes two ranked/sorted 5 card hands as parameters
+    #returns int: 1 for hand 1, 2 for hand 2, 0 for tie
+    def compare_hands(hand1, hand2):
+      if hand1[5] > hand2[5]:
+        return 1
+      elif hand1[5] < hand2[5]:
+        return 2
+      else:
+        #high card/flush comparison, hand rank = 0 or 5
+        if hand1[5] == 0 or hand1[5] == 5:
+          if hand1[0].rank > hand2[0].rank:
             return 1
-          elif hand1[1].rank < hand2[1].rank:
+          elif hand1[0].rank < hand2[0].rank:
+            return 2
+          else:
+            if hand1[1].rank > hand2[1].rank:
+              return 1
+            elif hand1[1].rank < hand2[1].rank:
+              return 2
+            else:
+              if hand1[2].rank > hand2[2].rank:
+                return 1
+              elif hand1[2].rank < hand2[2].rank:
+                return 2
+              else:
+                if hand1[3].rank > hand2[3].rank:
+                  return 1
+                elif hand1[3].rank < hand2[3].rank:
+                  return 2
+                else:
+                  if hand1[4].rank > hand2[4].rank:
+                    return 1
+                  elif hand1[4].rank < hand2[4].rank:
+                    return 2
+                  else:
+                    return 0
+        #one pair comparison, hand rank = 1
+        elif hand1[5] == 1:
+          if hand1[0].rank > hand2[0].rank:
+            return 1
+          elif hand1[0].rank < hand2[0].rank:
             return 2
           else:
             if hand1[2].rank > hand2[2].rank:
@@ -360,16 +414,29 @@ for each in range(0, number_of_trials):
                   return 2
                 else:
                   return 0
-      #one pair comparison, hand rank = 1
-      elif hand1[5] == 1:
-        if hand1[0].rank > hand2[0].rank:
-          return 1
-        elif hand1[0].rank < hand2[0].rank:
-          return 2
-        else:
-          if hand1[2].rank > hand2[2].rank:
+        #two pair comparison, hand rank = 2
+        elif hand1[5] == 2:
+          if hand1[0].rank > hand2[0].rank:
             return 1
-          elif hand1[2].rank < hand2[2].rank:
+          elif hand1[0].rank < hand2[0].rank:
+            return 2
+          else:
+            if hand1[2].rank > hand2[2].rank:
+              return 1
+            elif hand1[2].rank < hand2[2].rank:
+              return 2
+            else:
+              if hand1[4].rank > hand2[4].rank:
+                return 1
+              elif hand1[4].rank < hand1[4].rank:
+                return 2
+              else:
+                return 0
+        #trips comparison, hand rank = 3
+        elif hand1[5] == 3:
+          if hand1[0].rank > hand2[0].rank:
+            return 1
+          elif hand1[0].rank < hand2[0].rank:
             return 2
           else:
             if hand1[3].rank > hand2[3].rank:
@@ -383,34 +450,32 @@ for each in range(0, number_of_trials):
                 return 2
               else:
                 return 0
-      #two pair comparison, hand rank = 2
-      elif hand1[5] == 2:
-        if hand1[0].rank > hand2[0].rank:
-          return 1
-        elif hand1[0].rank < hand2[0].rank:
-          return 2
-        else:
-          if hand1[2].rank > hand2[2].rank:
+        #straight/straight flush comparison, hand rank = 4 or 8
+        elif hand1[5] == 4 or hand1[5] == 8:
+          if hand1[0].rank > hand2[0].rank:
             return 1
-          elif hand1[2].rank < hand2[2].rank:
+          elif hand1[0].rank < hand2[0].rank:
             return 2
           else:
-            if hand1[4].rank > hand2[4].rank:
+            return 0
+        #full house comparison, hand rank = 6
+        elif hand1[5] == 6:
+          if hand1[0].rank > hand2[0].rank:
+            return 1
+          elif hand1[0].rank < hand2[0].rank:
+            return 2
+          else:
+            if hand1[3].rank > hand2[3].rank:
               return 1
-            elif hand1[4].rank < hand1[4].rank:
+            elif hand1[3].rank < hand2[3].rank:
               return 2
             else:
               return 0
-      #trips comparison, hand rank = 3
-      elif hand1[5] == 3:
-        if hand1[0].rank > hand2[0].rank:
-          return 1
-        elif hand1[0].rank < hand2[0].rank:
-          return 2
+        #quads comparison, hand rank = 7
         else:
-          if hand1[3].rank > hand2[3].rank:
+          if hand1[0].rank > hand2[0].rank:
             return 1
-          elif hand1[3].rank < hand2[3].rank:
+          elif hand1[0].rank < hand2[0].rank:
             return 2
           else:
             if hand1[4].rank > hand2[4].rank:
@@ -419,153 +484,121 @@ for each in range(0, number_of_trials):
               return 2
             else:
               return 0
-      #straight/straight flush comparison, hand rank = 4 or 8
-      elif hand1[5] == 4 or hand1[5] == 8:
-        if hand1[0].rank > hand2[0].rank:
-          return 1
-        elif hand1[0].rank < hand2[0].rank:
-          return 2
-        else:
-          return 0
-      #full house comparison, hand rank = 6
-      elif hand1[5] == 6:
-        if hand1[0].rank > hand2[0].rank:
-          return 1
-        elif hand1[0].rank < hand2[0].rank:
-          return 2
-        else:
-          if hand1[3].rank > hand2[3].rank:
-            return 1
-          elif hand1[3].rank < hand2[3].rank:
-            return 2
-          else:
-            return 0
-      #quads comparison, hand rank = 7
-      else:
-        if hand1[0].rank > hand2[0].rank:
-          return 1
-        elif hand1[0].rank < hand2[0].rank:
-          return 2
-        else:
-          if hand1[4].rank > hand2[4].rank:
-            return 1
-          elif hand1[4].rank < hand2[4].rank:
-            return 2
-          else:
-            return 0
+    
+    #***EXECUTE RANK/SORT***
+    
+    #build hand combos for each player
+    for i in range(0, number_of_players):
+      combo_builder(i, 0, 0, 1, 0, 1, 2)
+      combo_builder(i, 1, 0, 1, 0, 1, 3)
+      combo_builder(i, 2, 0, 1, 0, 1, 4)
+      combo_builder(i, 3, 0, 1, 0, 2, 3)
+      combo_builder(i, 4, 0, 1, 0, 2, 4)
+      combo_builder(i, 5, 0, 1, 0, 3, 4)
+      combo_builder(i, 6, 0, 1, 1, 2, 3)
+      combo_builder(i, 7, 0, 1, 1, 2, 4)
+      combo_builder(i, 8, 0, 1, 1, 3, 4)
+      combo_builder(i, 9, 0, 1, 2, 3, 4)
+      combo_builder(i, 10, 0, 2, 0, 1, 2)
+      combo_builder(i, 11, 0, 2, 0, 1, 3)
+      combo_builder(i, 12, 0, 2, 0, 1, 4)
+      combo_builder(i, 13, 0, 2, 0, 2, 3)
+      combo_builder(i, 14, 0, 2, 0, 2, 4)
+      combo_builder(i, 15, 0, 2, 0, 3, 4)
+      combo_builder(i, 16, 0, 2, 1, 2, 3)
+      combo_builder(i, 17, 0, 2, 1, 2, 4)
+      combo_builder(i, 18, 0, 2, 1, 3, 4)
+      combo_builder(i, 19, 0, 2, 2, 3, 4)
+      combo_builder(i, 20, 0, 3, 0, 1, 2)
+      combo_builder(i, 21, 0, 3, 0, 1, 3)
+      combo_builder(i, 22, 0, 3, 0, 1, 4)
+      combo_builder(i, 23, 0, 3, 0, 2, 3)
+      combo_builder(i, 24, 0, 3, 0, 2, 4)
+      combo_builder(i, 25, 0, 3, 0, 3, 4)
+      combo_builder(i, 26, 0, 3, 1, 2, 3)
+      combo_builder(i, 27, 0, 3, 1, 2, 4)
+      combo_builder(i, 28, 0, 3, 1, 3, 4)
+      combo_builder(i, 29, 0, 3, 2, 3, 4)
+      combo_builder(i, 30, 1, 2, 0, 1, 2)
+      combo_builder(i, 31, 1, 2, 0, 1, 3)
+      combo_builder(i, 32, 1, 2, 0, 1, 4)
+      combo_builder(i, 33, 1, 2, 0, 2, 3)
+      combo_builder(i, 34, 1, 2, 0, 2, 4)
+      combo_builder(i, 35, 1, 2, 0, 3, 4)
+      combo_builder(i, 36, 1, 2, 1, 2, 3)
+      combo_builder(i, 37, 1, 2, 1, 2, 4)
+      combo_builder(i, 38, 1, 2, 1, 3, 4)
+      combo_builder(i, 39, 1, 2, 2, 3, 4)
+      combo_builder(i, 40, 1, 3, 0, 1, 2)
+      combo_builder(i, 41, 1, 3, 0, 1, 3)
+      combo_builder(i, 42, 1, 3, 0, 1, 4)
+      combo_builder(i, 43, 1, 3, 0, 2, 3)
+      combo_builder(i, 44, 1, 3, 0, 2, 4)
+      combo_builder(i, 45, 1, 3, 0, 3, 4)
+      combo_builder(i, 46, 1, 3, 1, 2, 3)
+      combo_builder(i, 47, 1, 3, 1, 2, 4)
+      combo_builder(i, 48, 1, 3, 1, 3, 4)
+      combo_builder(i, 49, 1, 3, 2, 3, 4)
+      combo_builder(i, 50, 2, 3, 0, 1, 2)
+      combo_builder(i, 51, 2, 3, 0, 1, 3)
+      combo_builder(i, 52, 2, 3, 0, 1, 4)
+      combo_builder(i, 53, 2, 3, 0, 2, 3)
+      combo_builder(i, 54, 2, 3, 0, 2, 4)
+      combo_builder(i, 55, 2, 3, 0, 3, 4)
+      combo_builder(i, 56, 2, 3, 1, 2, 3)
+      combo_builder(i, 57, 2, 3, 1, 2, 4)
+      combo_builder(i, 58, 2, 3, 1, 3, 4)
+      combo_builder(i, 59, 2, 3, 2, 3, 4)
+    
+    #rank and sort all combos for all players
+    for i in range(0, number_of_players):
+      for j in range(0, 60):
+        rank_hand(unranked_combos[i][j])
+        sort_hand(unranked_combos[i][j])
+    
+    #top hand array, one hand per each player
+    top_hand = []
+    for i in range(0, number_of_players):
+      top_hand.append(unranked_combos[i][0])
+    
+    #find the highest rank of all 60 combos for each player
+    for i in range(0, number_of_players):
+      for j in range(1, 60):
+        if compare_hands(unranked_combos[i][j], top_hand[i]) == 1:
+          top_hand[i] = unranked_combos[i][j]
+    
+    #search for the strongest hand amongst the list of top hands
+    #search amongst all player hands for matches with the highest hand strength
+    #increment hand tallies using winning player indices
+    #increment by value based on the quantity of winning player indices
+    strongest_hand = top_hand[0]
+    for i in range(1, number_of_players):
+      if compare_hands(top_hand[i], strongest_hand) == 1:
+        strongest_hand = top_hand[i]
+    
+    winner_indices = []
+    for i in range(0, number_of_players):
+      if (top_hand[i][0].rank == strongest_hand[0].rank and
+        top_hand[i][1].rank == strongest_hand[1].rank and
+        top_hand[i][2].rank == strongest_hand[2].rank and
+        top_hand[i][3].rank == strongest_hand[3].rank and
+        top_hand[i][4].rank == strongest_hand[4].rank and
+        top_hand[i][5] == strongest_hand[5]):
+        winner_indices.append(i)
+    
+    #hand tally
+    hand_tally = [0.00] * number_of_players
+    for i in range(0, len(winner_indices)):
+      hand_tally[winner_indices[i]] = (1.00 / len(winner_indices))
+    
+    for i in range(0, number_of_players):
+      final_tally[i] = final_tally[i] + hand_tally[i]
   
-  #***EXECUTE RANK/SORT***
+  #***GENERATE OUTPUT***
   
-  #build hand combos for each player
+  player_percentage = [0] * number_of_players
   for i in range(0, number_of_players):
-    combo_builder(i, 0, 0, 1, 0, 1, 2)
-    combo_builder(i, 1, 0, 1, 0, 1, 3)
-    combo_builder(i, 2, 0, 1, 0, 1, 4)
-    combo_builder(i, 3, 0, 1, 0, 2, 3)
-    combo_builder(i, 4, 0, 1, 0, 2, 4)
-    combo_builder(i, 5, 0, 1, 0, 3, 4)
-    combo_builder(i, 6, 0, 1, 1, 2, 3)
-    combo_builder(i, 7, 0, 1, 1, 2, 4)
-    combo_builder(i, 8, 0, 1, 1, 3, 4)
-    combo_builder(i, 9, 0, 1, 2, 3, 4)
-    combo_builder(i, 10, 0, 2, 0, 1, 2)
-    combo_builder(i, 11, 0, 2, 0, 1, 3)
-    combo_builder(i, 12, 0, 2, 0, 1, 4)
-    combo_builder(i, 13, 0, 2, 0, 2, 3)
-    combo_builder(i, 14, 0, 2, 0, 2, 4)
-    combo_builder(i, 15, 0, 2, 0, 3, 4)
-    combo_builder(i, 16, 0, 2, 1, 2, 3)
-    combo_builder(i, 17, 0, 2, 1, 2, 4)
-    combo_builder(i, 18, 0, 2, 1, 3, 4)
-    combo_builder(i, 19, 0, 2, 2, 3, 4)
-    combo_builder(i, 20, 0, 3, 0, 1, 2)
-    combo_builder(i, 21, 0, 3, 0, 1, 3)
-    combo_builder(i, 22, 0, 3, 0, 1, 4)
-    combo_builder(i, 23, 0, 3, 0, 2, 3)
-    combo_builder(i, 24, 0, 3, 0, 2, 4)
-    combo_builder(i, 25, 0, 3, 0, 3, 4)
-    combo_builder(i, 26, 0, 3, 1, 2, 3)
-    combo_builder(i, 27, 0, 3, 1, 2, 4)
-    combo_builder(i, 28, 0, 3, 1, 3, 4)
-    combo_builder(i, 29, 0, 3, 2, 3, 4)
-    combo_builder(i, 30, 1, 2, 0, 1, 2)
-    combo_builder(i, 31, 1, 2, 0, 1, 3)
-    combo_builder(i, 32, 1, 2, 0, 1, 4)
-    combo_builder(i, 33, 1, 2, 0, 2, 3)
-    combo_builder(i, 34, 1, 2, 0, 2, 4)
-    combo_builder(i, 35, 1, 2, 0, 3, 4)
-    combo_builder(i, 36, 1, 2, 1, 2, 3)
-    combo_builder(i, 37, 1, 2, 1, 2, 4)
-    combo_builder(i, 38, 1, 2, 1, 3, 4)
-    combo_builder(i, 39, 1, 2, 2, 3, 4)
-    combo_builder(i, 40, 1, 3, 0, 1, 2)
-    combo_builder(i, 41, 1, 3, 0, 1, 3)
-    combo_builder(i, 42, 1, 3, 0, 1, 4)
-    combo_builder(i, 43, 1, 3, 0, 2, 3)
-    combo_builder(i, 44, 1, 3, 0, 2, 4)
-    combo_builder(i, 45, 1, 3, 0, 3, 4)
-    combo_builder(i, 46, 1, 3, 1, 2, 3)
-    combo_builder(i, 47, 1, 3, 1, 2, 4)
-    combo_builder(i, 48, 1, 3, 1, 3, 4)
-    combo_builder(i, 49, 1, 3, 2, 3, 4)
-    combo_builder(i, 50, 2, 3, 0, 1, 2)
-    combo_builder(i, 51, 2, 3, 0, 1, 3)
-    combo_builder(i, 52, 2, 3, 0, 1, 4)
-    combo_builder(i, 53, 2, 3, 0, 2, 3)
-    combo_builder(i, 54, 2, 3, 0, 2, 4)
-    combo_builder(i, 55, 2, 3, 0, 3, 4)
-    combo_builder(i, 56, 2, 3, 1, 2, 3)
-    combo_builder(i, 57, 2, 3, 1, 2, 4)
-    combo_builder(i, 58, 2, 3, 1, 3, 4)
-    combo_builder(i, 59, 2, 3, 2, 3, 4)
-  
-  #rank and sort all combos for all players
-  for i in range(0, number_of_players):
-    for j in range(0, 60):
-      rank_hand(unranked_combos[i][j])
-      sort_hand(unranked_combos[i][j])
-  
-  #top hand array, one hand per each player
-  top_hand = []
-  for i in range(0, number_of_players):
-    top_hand.append(unranked_combos[i][0])
-  
-  #find the highest rank of all 60 combos for each player
-  for i in range(0, number_of_players):
-    for j in range(1, 60):
-      if compare_hands(unranked_combos[i][j], top_hand[i]) == 1:
-        top_hand[i] = unranked_combos[i][j]
-  
-  #search for the strongest hand amongst the list of top hands
-  #search amongst all player hands for matches with the highest hand strength
-  #increment hand tallies using winning player indices
-  #increment by value based on the quantity of winning player indices
-  strongest_hand = top_hand[0]
-  for i in range(1, number_of_players):
-    if compare_hands(top_hand[i], strongest_hand) == 1:
-      strongest_hand = top_hand[i]
-  
-  winner_indices = []
-  for i in range(0, number_of_players):
-    if (top_hand[i][0].rank == strongest_hand[0].rank and
-      top_hand[i][1].rank == strongest_hand[1].rank and
-      top_hand[i][2].rank == strongest_hand[2].rank and
-      top_hand[i][3].rank == strongest_hand[3].rank and
-      top_hand[i][4].rank == strongest_hand[4].rank and
-      top_hand[i][5] == strongest_hand[5]):
-      winner_indices.append(i)
-  
-  #hand tally
-  hand_tally = [0.00] * number_of_players
-  for i in range(0, len(winner_indices)):
-    hand_tally[winner_indices[i]] = (1.00 / len(winner_indices))
-  
-  for i in range(0, number_of_players):
-    final_tally[i] = final_tally[i] + hand_tally[i]
-
-#***GENERATE OUTPUT***
-
-player_percentage = [0] * number_of_players
-for i in range(0, number_of_players):
-  player_percentage[i] = (final_tally[i] / number_of_trials) * 100
-  print "Player %d equity:" % (i + 1), player_percentage[i], "%"
+    player_percentage[i] = (final_tally[i] / number_of_trials) * 100
+    print "Player %d equity:" % (i + 1), player_percentage[i], "%"
+    
+calculate(3)
